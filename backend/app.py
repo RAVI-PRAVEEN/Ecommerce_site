@@ -4,6 +4,7 @@ import tornado.ioloop
 import tornado.web
 from handlers.order_handler import OrderHandler
 from handlers.productshandler import ProductsHandler  # <- import here
+from handlers.auth_handler import AuthHandler
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -28,6 +29,7 @@ def make_app():
         (r"/api/products", ProductsHandler),
         (r"/uploads/(.*)", tornado.web.StaticFileHandler, {"path": UPLOAD_DIR}),
         (r"/api/orders", OrderHandler),
+        (r"/api/auth/(signup|login)", AuthHandler),
     ])
 
 if __name__ == "__main__":

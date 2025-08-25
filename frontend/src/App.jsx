@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Navbar from "./components/Navbar";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -10,6 +12,11 @@ function App() {
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem("cartItems");
     return savedCart ? JSON.parse(savedCart) : [];
+  });
+  
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
   });
 
   // Fetch products from backend
@@ -29,8 +36,18 @@ function App() {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // Save user in localStorage
+  useEffect(() => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
+
   // Add to cart
   const addToCart = (product) => {
+    if (!user) {
+      alert("Please login to add products to cart!");
+      return;
+    }
     setCartItems((prev) => {
       const exists = prev.find((item) => item.id === product.id);
       if (exists) {
@@ -53,7 +70,7 @@ function App() {
 
   return (
     <div>
-      <Navbar cartItems={cartItems} />
+      <Navbar cartItems={cartItems} user={user} setUser={setUser} />
       <div style={{ marginTop: "60px" }}>
         <Routes>
           <Route path="/" element={<Home products={products} />} />
@@ -67,10 +84,12 @@ function App() {
               <Cart
                 cartItems={cartItems}
                 setCartItems={setCartItems}
-                onOrderSuccess={handleOrderSuccess} // Pass success handler
+                onOrderSuccess={handleOrderSuccess}
               />
             }
           />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login setUser={setUser} />} />
         </Routes>
       </div>
     </div>
