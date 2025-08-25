@@ -1,13 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Products({ addToCart, products }) {
+function Products({ addToCart }) {
+  const navigate = useNavigate();
+
+  // Product list state
+  const [products, setProducts] = useState([]);
+
+  // States for product grid
   const [expanded, setExpanded] = useState({});
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("All");
   const [selectedPriceFilter, setSelectedPriceFilter] = useState("All");
   const [sortOption, setSortOption] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
+
+  // States for Add Product form
+  const [showForm, setShowForm] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [category, setCategory] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [image, setImage] = useState(null);
+
+  // Fetch products from backend
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:8888/api/products");
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   // Categories & price ranges
   const categories = ["All", ...new Set(products.map((p) => p.category).filter(Boolean))];
@@ -20,6 +50,7 @@ function Products({ addToCart, products }) {
     { label: "1001+", min: 1001, max: Infinity },
   ];
 
+  // Filtered & sorted products
   const filteredProducts = products
     .filter(p => selectedCategoryFilter === "All" || p.category === selectedCategoryFilter)
     .filter(p => {
@@ -42,13 +73,50 @@ function Products({ addToCart, products }) {
       }
     });
 
+  // Toggle Read More
   const toggleReadMore = (id) => {
     setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Handle Add Product form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("stock", stock);
+    formData.append("category", category === "Other" ? newCategory : category);
+    if (image) formData.append("image", image);
+
+    try {
+      const res = await fetch("http://localhost:8888/api/products", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Product added successfully!");
+        setShowForm(false);
+        // Reset form
+        setName(""); setDescription(""); setPrice(""); setStock(""); setCategory(""); setNewCategory(""); setImage(null);
+        // Refresh product list
+        fetchProducts();
+      } else {
+        alert(data.error || "Failed to add product");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error adding product");
+    }
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Products</h2>
+
+      {/* Search */}
       <input
         type="text"
         placeholder="Search products..."
@@ -73,6 +141,48 @@ function Products({ addToCart, products }) {
           <option value="nameDesc">Name: Z-A</option>
         </select>
       </div>
+
+      {/* Toggle Add Product Form */}
+      <button
+        onClick={() => setShowForm(prev => !prev)}
+        style={{
+          background: "#007BFF",
+          color: "#fff",
+          padding: "8px 12px",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginBottom: "10px",
+        }}
+      >
+        {showForm ? "Hide Add Product Form" : "Click here to add a product"}
+      </button>
+
+      {/* Add Product Form */}
+      {showForm && (
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "300px", marginBottom: "20px" }}>
+          <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+          <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+          <input type="number" placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} required />
+          <input type="number" placeholder="Stock" value={stock} onChange={e => setStock(e.target.value)} required />
+
+          <select value={category} onChange={e => setCategory(e.target.value)} required>
+            <option value="">Select Category</option>
+            {categories.filter(c => c !== "All").map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            <option value="Other">Other</option>
+          </select>
+
+          {category === "Other" && (
+            <input type="text" placeholder="Enter new category" value={newCategory} onChange={e => setNewCategory(e.target.value)} required />
+          )}
+
+          <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
+
+          <button type="submit" style={{ background: "#4CAF50", color: "#fff", padding: "8px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
+            Add Product
+          </button>
+        </form>
+      )}
 
       {/* Product Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "20px" }}>
