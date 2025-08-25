@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-function Cart({ cartItems, setCartItems }) {
+function Cart({ cartItems, setCartItems, onOrderSuccess }) {
   const [showModal, setShowModal] = useState(false);
 
-  // Load cart from localStorage
+  // Sync with localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
+    const savedCart = localStorage.getItem("cartItems");
     if (savedCart) setCartItems(JSON.parse(savedCart));
   }, [setCartItems]);
 
-  // Save cart to localStorage
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   const handleRemove = (id) => {
@@ -22,9 +21,7 @@ function Cart({ cartItems, setCartItems }) {
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === id
-          ? item.quantity < item.stock
-            ? { ...item, quantity: item.quantity + 1 }
-            : (alert("Cannot add more than stock!"), item)
+          ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
           : item
       )
     );
@@ -45,22 +42,48 @@ function Cart({ cartItems, setCartItems }) {
     0
   );
 
-  const handleCheckout = () => {
-    setShowModal(true);
-  };
+  const handleCheckout = () => setShowModal(true);
 
-  const confirmCheckout = () => {
-    alert("Checkout successful!");
-    setCartItems([]);
-    setShowModal(false);
+  const confirmCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert("Cart is empty!");
+      return;
+    }
+
+    try {
+      console.log("Sending order:", { items: cartItems, total_price: totalPrice });
+
+      const response = await fetch("http://localhost:8888/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cartItems, total_price: totalPrice }),
+      });
+
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      if (response.ok) {
+        alert("Checkout successful!");
+        // Clear cart state and localStorage
+        setCartItems([]);
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        setShowModal(false);
+        // Refresh products stock in parent
+        onOrderSuccess();
+      } else {
+        alert("Error placing order: " + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error placing order: " + err.message);
+    }
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2 style={{ marginBottom: "20px" }}>Your Cart</h2>
-
+      <h2>Your Cart</h2>
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p>Cart is empty</p>
       ) : (
         <div
           style={{
@@ -151,7 +174,7 @@ function Cart({ cartItems, setCartItems }) {
 
       {cartItems.length > 0 && (
         <>
-          <h3 style={{ marginTop: "20px" }}>Total: ₹ {totalPrice.toFixed(2)}</h3>
+          <h3>Total: ₹ {totalPrice.toFixed(2)}</h3>
           <button
             onClick={handleCheckout}
             style={{
@@ -169,7 +192,6 @@ function Cart({ cartItems, setCartItems }) {
         </>
       )}
 
-      {/* Confirmation Modal with Summary */}
       {showModal && (
         <div
           style={{
@@ -193,8 +215,13 @@ function Cart({ cartItems, setCartItems }) {
             }}
           >
             <h3>Confirm Checkout</h3>
-            <p>Review your items:</p>
-            <div style={{ maxHeight: "200px", overflowY: "auto", marginBottom: "10px" }}>
+            <div
+              style={{
+                maxHeight: "200px",
+                overflowY: "auto",
+                marginBottom: "10px",
+              }}
+            >
               {cartItems.map((item) => (
                 <div
                   key={item.id}
@@ -205,13 +232,21 @@ function Cart({ cartItems, setCartItems }) {
                     padding: "5px 0",
                   }}
                 >
-                  <span>{item.name} x {item.quantity}</span>
+                  <span>
+                    {item.name} x {item.quantity}
+                  </span>
                   <span>₹ {(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
             <h4>Total: ₹ {totalPrice.toFixed(2)}</h4>
-            <div style={{ display: "flex", gap: "10px", marginTop: "15px" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginTop: "15px",
+              }}
+            >
               <button
                 onClick={confirmCheckout}
                 style={{

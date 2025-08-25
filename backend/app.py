@@ -4,15 +4,17 @@ import tornado.web
 import json
 from decimal import Decimal
 from db import get_connection
+from handlers.order_handler import OrderHandler
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
-        self.set_header("Access-Control-Allow-Origin", "http://localhost:5173")
+        # Allow all origins for testing
+        self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "Content-Type")
-        self.set_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.set_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS, PUT")
 
     def options(self, *args, **kwargs):
         self.set_status(204)
@@ -45,7 +47,7 @@ class ProductsHandler(BaseHandler):
             description = self.get_body_argument("description", None)
             price = self.get_body_argument("price")
             stock = self.get_body_argument("stock")
-            category = self.get_body_argument("category")  # mandatory
+            category = self.get_body_argument("category")
 
             image_url = None
             if "image" in self.request.files:
@@ -77,26 +79,12 @@ class ProductsHandler(BaseHandler):
             self.set_status(400)
             self.write(json.dumps({"error": str(e)}))
 
-    def delete(self):
-        try:
-            product_id = self.get_argument("id")
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM products WHERE id = %s", (product_id,))
-            conn.commit()
-            cursor.close()
-            conn.close()
-            self.set_header("Content-Type", "application/json")
-            self.write(json.dumps({"message": f"Product {product_id} deleted"}))
-        except Exception as e:
-            self.set_status(400)
-            self.write(json.dumps({"error": str(e)}))
-
 def make_app():
     return tornado.web.Application([
         (r"/", MainHandler),
         (r"/api/products", ProductsHandler),
         (r"/uploads/(.*)", tornado.web.StaticFileHandler, {"path": UPLOAD_DIR}),
+        (r"/api/orders", OrderHandler),
     ])
 
 if __name__ == "__main__":
