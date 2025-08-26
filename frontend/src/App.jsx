@@ -85,6 +85,7 @@ function App() {
                 cartItems={cartItems}
                 setCartItems={setCartItems}
                 onOrderSuccess={handleOrderSuccess}
+                user={user}
               />
             }
           />

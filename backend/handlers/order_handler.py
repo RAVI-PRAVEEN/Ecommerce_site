@@ -5,18 +5,24 @@ from db import get_connection
 class OrderHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type")
+        self.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 
-    def options(self, *args, **kwargs):
+    async def options(self, *args, **kwargs):
         self.set_status(204)
         self.finish()
 
     async def post(self):
         try:
             data = json.loads(self.request.body.decode("utf-8"))
+            user_id = data.get("user_id")
             items = data.get("items", [])
             total_price = data.get("total_price", 0)
+
+            if not user_id:
+                self.set_status(401)
+                self.write({"error": "User must be logged in"})
+                return
 
             if not items:
                 self.set_status(400)
@@ -33,7 +39,6 @@ class OrderHandler(tornado.web.RequestHandler):
 
                 cursor.execute("SELECT stock FROM products WHERE id=%s", (product_id,))
                 product = cursor.fetchone()
-
                 if not product:
                     conn.rollback()
                     cursor.close()
@@ -41,7 +46,6 @@ class OrderHandler(tornado.web.RequestHandler):
                     self.set_status(400)
                     self.write({"error": f"Product {product_id} not found"})
                     return
-
                 if product["stock"] < quantity:
                     conn.rollback()
                     cursor.close()
@@ -50,18 +54,15 @@ class OrderHandler(tornado.web.RequestHandler):
                     self.write({"error": f"Not enough stock for product {product_id}"})
                     return
 
-                cursor.execute(
-                    "UPDATE products SET stock = stock - %s WHERE id=%s",
-                    (quantity, product_id),
-                )
+                cursor.execute("UPDATE products SET stock = stock - %s WHERE id=%s",
+                               (quantity, product_id))
 
             # Insert order
             cursor.execute(
-                "INSERT INTO orders (items, total_price) VALUES (%s, %s)",
-                (json.dumps(items), total_price),
+                "INSERT INTO orders (user_id, items, total_price) VALUES (%s, %s, %s)",
+                (user_id, json.dumps(items), total_price)
             )
             conn.commit()
-
             cursor.close()
             conn.close()
 
@@ -77,9 +78,8 @@ class OrderHandler(tornado.web.RequestHandler):
             conn = get_connection()
             cursor = conn.cursor(dictionary=True)
 
-            cursor.execute("SELECT * FROM orders ORDER BY created_at DESC")
+            cursor.execute("SELECT o.*, u.username, u.email FROM orders o LEFT JOIN users u ON o.user_id = u.id ORDER BY o.created_at DESC")
             rows = cursor.fetchall()
-
             cursor.close()
             conn.close()
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-function Cart({ cartItems, setCartItems, onOrderSuccess }) {
+function Cart({ cartItems, setCartItems, onOrderSuccess, user }) {
   const [showModal, setShowModal] = useState(false);
 
   // Sync with localStorage
@@ -42,21 +42,32 @@ function Cart({ cartItems, setCartItems, onOrderSuccess }) {
     0
   );
 
-  const handleCheckout = () => setShowModal(true);
+  const handleCheckout = () => {
+    if (!user) {
+      alert("You must be logged in to place an order.");
+      return;
+    }
+    setShowModal(true);
+  };
 
   const confirmCheckout = async () => {
+    if (!user) {
+      alert("You must be logged in to place an order.");
+      return;
+    }
+
     if (cartItems.length === 0) {
       alert("Cart is empty!");
       return;
     }
 
     try {
-      console.log("Sending order:", { items: cartItems, total_price: totalPrice });
+      console.log("Sending order:", { user_id: user.id, items: cartItems, total_price: totalPrice });
 
       const response = await fetch("http://localhost:8888/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: cartItems, total_price: totalPrice }),
+        body: JSON.stringify({ user_id: user.id, items: cartItems, total_price: totalPrice }),
       });
 
       const data = await response.json();
@@ -64,11 +75,9 @@ function Cart({ cartItems, setCartItems, onOrderSuccess }) {
 
       if (response.ok) {
         alert("Checkout successful!");
-        // Clear cart state and localStorage
         setCartItems([]);
         localStorage.setItem("cartItems", JSON.stringify([]));
         setShowModal(false);
-        // Refresh products stock in parent
         onOrderSuccess();
       } else {
         alert("Error placing order: " + data.error);
