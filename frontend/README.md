@@ -39,7 +39,7 @@ npm install
 
 ### Running Locally
 ```bash
-npm start
+npm run dev
 ```
 
 ### Access Application
