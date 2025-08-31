@@ -1,5 +1,4 @@
 Ecommerce site
-
 Overview
 This is a React-based e-commerce application with a backend API, enabling users to browse products, add them to a cart, and place orders. The project demonstrates state management, routing, and API integration.
 
