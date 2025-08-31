@@ -4,12 +4,12 @@ Overview:
 
 This is a React-based e-commerce application with a backend API, enabling users to browse products, add them to a cart, and place orders. The project demonstrates state management, routing, and API integration.
 
-The technologies used for this project are:-
-Frontend codebase: React 
-Backend codebase: Python with tornado framework 
-Database: MySQL
+The technologies used for this project are:- 
+->Frontend codebase: React 
+->Backend codebase: Python with tornado framework 
+->Database: MySQL
 
-The features oof the app are :-
+The features of the app are :-
 Frontend
 Login/signup page:
 ->Users can register a new account or login with existing credentials.
