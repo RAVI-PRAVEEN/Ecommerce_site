@@ -71,7 +71,7 @@ A full-stack e-commerce web application built with **React** for the frontend an
     ```
 2. **Start frontend:**
     ```bash
-    npm start
+    npm run dev
     ```
 3. **Open browser at:**  
    [http://localhost:5173](http://localhost:5173)
