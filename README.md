@@ -1,57 +1,79 @@
-Ecommerce site 
-Overview 
-This is a React-based e-commerce application with a backend API, enabling users to browse products, add them to a cart, and place orders. The project demonstrates state management, routing, and API integration.
+# Ecommerce Site
 
-The technologies used for this project are :- 
-Frontend codebase: React  
-Backend codebase: Python with tornado framework 
-Database: MySQL
+## Overview
+A full-stack e-commerce web application built with **React** for the frontend and **Python (Tornado framework)** for the backend. Users can browse products, manage their cart, and place orders. The project demonstrates modern state management, routing, and RESTful API integration.
 
-The features oof the app are :- 
-Frontend  
-Login/signup page: 
-->Users can register a new account or login with existing credentials. 
-->Form validation for email and password. 
-->Successful login sets user state, enabling checkout. 
-->Provides feedback on authentication errors.
+---
 
-Home Page: 
-->Hero section with “Shop Now” button. 
-->Products grouped by category.
+## Technologies Used
+- **Frontend:** React
+- **Backend:** Python (Tornado)
+- **Database:** MySQL
 
-Products Page: 
-->Display all products in a grid layout. 
-->Filter by category, price, and search query. 
-->Sort products by price or name. 
-->Add new products dynamically.
+---
 
-Cart Page: 
-->View cart items with quantity management. 
-->Remove items from cart. 
-->Checkout modal with order summary.
+## Main Features
 
-BackendREST API endpoints: 
-->GET /api/products – Fetch all products. 
-->POST /api/products – Add new product. 
-->POST /api/orders – Place an order.
+### Frontend
 
-Stores product details including name, description, price, stock, category, and image. 
-Handles orders linked to a user.
+#### Login/Signup Page
+- User registration and login
+- Email and password form validation
+- Persistent user state after login for checkout access
+- Real-time feedback on authentication errors
 
-Installation & Setup 
-BackendInstall dependencies: 
+#### Home Page
+- Hero section with “Shop Now” button
+- Products grouped by category
+
+#### Products Page
+- Grid display of all products
+- Filter by category, price, and search query
+- Sort products by price or name
+- Add new products dynamically (admin feature)
+
+#### Cart Page
+- View items in cart with quantity management
+- Remove items from cart
+- Checkout modal with order summary
+
+---
+
+### Backend (REST API Endpoints)
+
+- `GET /api/products` – Fetch all products
+- `POST /api/products` – Add new product
+- `POST /api/orders` – Place an order
+
+- Stores product details: name, description, price, stock, category, image
+- Handles order placement, linked to user accounts
+
+---
+
+## Installation & Setup
+
+### Backend
+1. **Install dependencies:**
+    ```bash
     pip install tornado mysql-connector-python
-
-Run backend server: 
+    ```
+2. **Run backend server:**
+    ```bash
     python app.py
+    ```
+3. **API available at:**  
+   [http://localhost:8888/api/](http://localhost:8888/api/)
 
-API runs on: http://localhost:8888/api/
-
-Frontend 
-Install dependencies:
+### Frontend
+1. **Install dependencies:**
+    ```bash
     npm install
-
-Start frontend: 
+    ```
+2. **Start frontend:**
+    ```bash
     npm start
+    ```
+3. **Open browser at:**  
+   [http://localhost:5173](http://localhost:5173)
 
-Open browser at: http://localhost:5173
+---
