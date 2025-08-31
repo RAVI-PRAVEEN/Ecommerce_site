@@ -1,12 +1,52 @@
-# React + Vite
+# Ecommerce Site – Frontend Preview
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Technologies Used
+- **React** (Frontend framework)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Frontend Features
 
-## Expanding the ESLint configuration
+### 1. Login/Signup Page
+- User registration and login
+- Email and password form validation
+- Persistent user state after login for enabling checkout
+- Real-time feedback on authentication errors
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 2. Home Page
+- Hero section with a “Shop Now” button
+- Products grouped by category for easy navigation
+
+### 3. Products Page
+- Grid display of all products
+- Filter options: category, price, and search query
+- Sort products by price or name
+- Dynamic addition of new products (admin feature)
+
+### 4. Cart Page
+- View cart items with quantity management
+- Remove items from cart
+- Checkout modal displaying order summary
+
+---
+
+## Getting Started
+
+### Installation
+```bash
+npm install
+```
+
+### Running Locally
+```bash
+npm start
+```
+
+### Access Application
+Open your browser and go to:  
+[http://localhost:5173](http://localhost:5173)
+
+---
+
+## Summary
+The frontend is a modern, user-friendly React application designed to provide a smooth shopping experience. It includes authentication, product browsing, search and filter capabilities, cart management, and a streamlined checkout process.
