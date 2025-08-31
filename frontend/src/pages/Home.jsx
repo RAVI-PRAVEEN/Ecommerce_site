@@ -80,19 +80,15 @@ function Home({ products }) {
                     boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
                   }}
                 >
-                  {p.image_url && (
-                    <img
-                      src={`http://localhost:8888/${p.image_url}`}
-                      alt={p.name}
-                      style={{
-                        width: "100%",
-                        height: "150px",
-                        objectFit: "cover",
-                        borderRadius: "5px",
-                        marginBottom: "10px",
-                      }}
-                    />
-                  )}
+                  {p.image_url ? 
+                    <img src={`http://localhost:8888/${p.image_url}`} alt={p.name} 
+                    style={{ width: "100%", height: "150px", objectFit: "cover", borderRadius: "5px" }} 
+                    /> : 
+                    <div 
+                      style={{ width: "100%", height: "150px", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      No Image
+                    </div>}
+            
                   <h3>{p.name}</h3>
                   <p
                     style={{

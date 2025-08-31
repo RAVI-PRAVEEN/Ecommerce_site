@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 function Login({ setUser }) {
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ function Login({ setUser }) {
       if (res.ok) {
         alert("Login successful!");
         localStorage.setItem("user", JSON.stringify(data.user));
-        setUser(data.user); // Update user state in App or Context
-        navigate("/"); // Redirect to home or products
+        setUser(data.user); 
+        navigate("/"); 
       } else {
         alert(data.error || "Login failed");
       }
@@ -32,16 +33,33 @@ function Login({ setUser }) {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto" }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit" style={{ background: "#4CAF50", color: "#fff", padding: "8px", borderRadius: "5px", border: "none", cursor: "pointer" }}>Login</button>
-      </form>
-      <p style={{ marginTop: "10px" }}>
-        Don't have an account? <span style={{ color: "blue", cursor: "pointer" }} onClick={() => navigate("/signup")}>Sign Up</span>
-      </p>
+    <div className="login-wrapper">
+      <div className="login-box">
+        <h2>Login</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+        <p className="signup-text">
+          Don't have an account?{" "}
+          <span className="signup-link" onClick={() => navigate("/signup")}>
+            Sign Up
+          </span>
+        </p>
+      </div>
     </div>
   );
 }

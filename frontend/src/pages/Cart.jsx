@@ -90,9 +90,9 @@ function Cart({ cartItems, setCartItems, onOrderSuccess, user }) {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Your Cart</h2>
+      <h2 style={{ fontSize: "35px", textAlign: "center" ,}}>Your Cart</h2>
       {cartItems.length === 0 ? (
-        <p>Cart is empty</p>
+        <p style={{ fontSize: "20px", textAlign: "center" }}>Cart is empty</p>
       ) : (
         <div
           style={{

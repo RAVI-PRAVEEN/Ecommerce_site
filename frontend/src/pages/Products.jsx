@@ -114,7 +114,8 @@ function Products({ addToCart }) {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Products</h2>
+      <h2 style={{ fontSize: "35px", textAlign: "center" }}>Products</h2>
+
 
       {/* Search */}
       <input
@@ -146,7 +147,7 @@ function Products({ addToCart }) {
       <button
         onClick={() => setShowForm(prev => !prev)}
         style={{
-          background: "#007BFF",
+          background: "#20ca53ff",
           color: "#fff",
           padding: "8px 12px",
           border: "none",

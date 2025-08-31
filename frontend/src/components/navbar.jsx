@@ -1,7 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import "./Navbar.css";
 
 function Navbar({ cartItems, user, setUser }) {
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     setUser(null);
@@ -10,67 +13,53 @@ function Navbar({ cartItems, user, setUser }) {
   };
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 20px",
-        background: "#f2f2f2",
-        width: "98%",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        zIndex: 1000,
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      {/* Logo */}
-      <div style={{ fontWeight: "bold", fontSize: "20px" }}>
-        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-          MyStore
-        </Link>
+    <nav className="navbar">
+      <div className="navbar-logo">
+        <Link to="/">🛒 MyStore</Link>
       </div>
 
-      {/* Links */}
-      <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
-        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-          Home
-        </Link>
-        <Link to="/products" style={{ textDecoration: "none", color: "black" }}>
-          Products
-        </Link>
-        <Link to="/cart" style={{ textDecoration: "none", color: "black" }}>
-          Cart ({cartItems.length})
-        </Link>
+      <div className="navbar-links">
+        <Link to="/">Home</Link>
+        <Link to="/products">Products</Link>
+        <Link to="/cart">Cart ({cartItems.length})</Link>
 
-        {/* Auth Links */}
+        {/* Auth Section */}
         {!user ? (
-          <>
-            <Link to="/login" style={{ textDecoration: "none", color: "black" }}>
-              Login
-            </Link>
-            <Link to="/signup" style={{ textDecoration: "none", color: "black" }}>
-              Signup
-            </Link>
-          </>
-        ) : (
-          <>
-            <span style={{ fontWeight: "bold" }}>{user.username}</span>
-            <button
-              onClick={handleLogout}
-              style={{
-                background: "#ff4d4d",
-                color: "#fff",
-                border: "none",
-                padding: "5px 10px",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Logout
+          <div className="navbar-auth">
+            <button className="dropbtn">
+              <Link to="/login">Login</Link>
             </button>
-          </>
+            
+          </div>
+        ) : (
+          <div className="nav-right">
+            <div className="user-menu">
+              <div
+                className="user-icon"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                👤
+              </div>
+
+              {isDropdownOpen && (
+                <div className="dropdown">
+                  <div className="profile-circle">
+                    {user.username
+                      ? user.username.charAt(0).toUpperCase()
+                      : "U"}
+                  </div>
+                  <p className="username">{user.username.toUpperCase()}</p>
+                  <br/>
+                  <button
+                    className="logout-btn"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </nav>
