@@ -26,17 +26,32 @@ A full-stack e-commerce web application built with **React** for the frontend an
 - Hero section with “Shop Now” button
 - Products grouped by category
 
-#### Products Page
+#### Products Page (Users)
 - Grid display of all products
 - Filter by category, price, and search query
 - Sort products by price or name
-- Add new products dynamically (admin feature)
 
-#### Cart Page
+#### Products Page (Admins)
+- Grid display of all products
+- Filter by category, price, and search query
+- Sort products by price or name
+- Add new products dynamically 
+- Delete the products
+
+#### Cart Page (for Users)
 - View items in cart with quantity management
 - Remove items from cart
 - Checkout modal with order summary
 
+#### Orders Page (for Admins)
+- View all orders placed by users**
+- Displays for each order:
+  - **Order ID**
+  - **User**
+  - **Total Price**
+  - **Placed On (date)**
+  - **Items** (list of products/quantities)
+- Allows admins to monitor, review, and manage user orders
 ---
 
 ### Backend (REST API Endpoints)
@@ -44,9 +59,11 @@ A full-stack e-commerce web application built with **React** for the frontend an
 - `GET /api/products` – Fetch all products
 - `POST /api/products` – Add new product
 - `POST /api/orders` – Place an order
+-  `GET /api/orders` – **Admins only:** Fetch all placed orders with detail
 
 - Stores product details: name, description, price, stock, category, image
 - Handles order placement, linked to user accounts
+- - Orders endpoint provides full visibility for admins
 
 ---
 
