@@ -21,7 +21,11 @@ function Navbar({ cartItems, user, setUser }) {
       <div className="navbar-links">
         <Link to="/">Home</Link>
         <Link to="/products">Products</Link>
-        <Link to="/cart">Cart ({cartItems.length})</Link>
+        {user && user.role === "admin" ? (
+          <Link to="/orders">Orders</Link>
+          ) : (
+          <Link to="/cart">Cart ({cartItems.length})</Link>
+          )}
 
         {/* Auth Section */}
         {!user ? (

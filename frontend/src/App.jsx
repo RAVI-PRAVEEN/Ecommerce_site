@@ -5,6 +5,7 @@ import Cart from "./pages/Cart";
 import Navbar from "./components/Navbar";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import Orders from "./pages/Orders";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -89,6 +90,7 @@ function App() {
               />
             }
           />
+          <Route path="/orders" element={<Orders user={user} />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
         </Routes>
