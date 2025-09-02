@@ -38,7 +38,15 @@ class AuthHandler(tornado.web.RequestHandler):
                 user = cursor.fetchone()
                 if user and bcrypt.checkpw(password.encode(), user["password_hash"].encode()):
                     # For simplicity, return user info (in real apps, return JWT)
-                    self.write({"message": "Login successful", "user": {"id": user["id"], "username": user["username"], "email": user["email"]}})
+                    self.write({
+                        "message": "Login successful",
+                        "user": {
+                            "id": user["id"],
+                            "username": user["username"],
+                            "email": user["email"],
+                            "role": user["role"]
+                        }
+                    })
                 else:
                     self.set_status(401)
                     self.write({"error": "Invalid credentials"})

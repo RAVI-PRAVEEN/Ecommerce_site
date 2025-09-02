@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 function Products({ addToCart }) {
   const navigate = useNavigate();
 
+  // Get logged-in user from localStorage
+  const [user] = useState(() => JSON.parse(localStorage.getItem("user")));
+
   // Product list state
   const [products, setProducts] = useState([]);
 
@@ -112,10 +115,32 @@ function Products({ addToCart }) {
     }
   };
 
+  // Handle Delete Product
+  const handleDelete = async (productId, productName) => {
+    if (!window.confirm(`Are you sure you want to delete "${productName}"?`)) return;
+
+    try {
+      const res = await fetch("http://localhost:8888/api/products", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: productId, role: user.role }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert("Product deleted successfully");
+        fetchProducts(); // Refresh product list
+      } else {
+        alert(data.error || "Failed to delete product");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting product");
+    }
+  };
+
   return (
     <div style={{ padding: "20px" }}>
       <h2 style={{ fontSize: "35px", textAlign: "center" }}>Products</h2>
-
 
       {/* Search */}
       <input
@@ -143,46 +168,52 @@ function Products({ addToCart }) {
         </select>
       </div>
 
-      {/* Toggle Add Product Form */}
-      <button
-        onClick={() => setShowForm(prev => !prev)}
-        style={{
-          background: "#20ca53ff",
-          color: "#fff",
-          padding: "8px 12px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginBottom: "10px",
-        }}
-      >
-        {showForm ? "Hide Add Product Form" : "Click here to add a product"}
-      </button>
-
-      {/* Add Product Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "300px", marginBottom: "20px" }}>
-          <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
-          <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
-          <input type="number" placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} required />
-          <input type="number" placeholder="Stock" value={stock} onChange={e => setStock(e.target.value)} required />
-
-          <select value={category} onChange={e => setCategory(e.target.value)} required>
-            <option value="">Select Category</option>
-            {categories.filter(c => c !== "All").map(cat => <option key={cat} value={cat}>{cat}</option>)}
-            <option value="Other">Other</option>
-          </select>
-
-          {category === "Other" && (
-            <input type="text" placeholder="Enter new category" value={newCategory} onChange={e => setNewCategory(e.target.value)} required />
-          )}
-
-          <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
-
-          <button type="submit" style={{ background: "#4CAF50", color: "#fff", padding: "8px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
-            Add Product
+      {/* Add Product Form - Admin Only */}
+      {user && user.role === "admin" && (
+        <>
+          <button
+            onClick={() => setShowForm(prev => !prev)}
+            style={{
+              background: "#20ca53ff",
+              color: "#fff",
+              padding: "8px 12px",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginBottom: "10px",
+            }}
+          >
+            {showForm ? "Hide Add Product Form" : "Click here to add a product"}
           </button>
-        </form>
+
+          {showForm && (
+            <form
+              onSubmit={handleSubmit}
+              style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "300px", marginBottom: "20px" }}
+            >
+              <input type="text" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+              <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+              <input type="number" placeholder="Price" value={price} onChange={e => setPrice(e.target.value)} required />
+              <input type="number" placeholder="Stock" value={stock} onChange={e => setStock(e.target.value)} required />
+
+              <select value={category} onChange={e => setCategory(e.target.value)} required>
+                <option value="">Select Category</option>
+                {categories.filter(c => c !== "All").map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                <option value="Other">Other</option>
+              </select>
+
+              {category === "Other" && (
+                <input type="text" placeholder="Enter new category" value={newCategory} onChange={e => setNewCategory(e.target.value)} required />
+              )}
+
+              <input type="file" accept="image/*" onChange={e => setImage(e.target.files[0])} />
+
+              <button type="submit" style={{ background: "#4CAF50", color: "#fff", padding: "8px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
+                Add Product
+              </button>
+            </form>
+          )}
+        </>
       )}
 
       {/* Product Grid */}
@@ -195,6 +226,25 @@ function Products({ addToCart }) {
             {p.description && p.description.length > 100 && <span onClick={() => toggleReadMore(p.id)} style={{ color: "blue", cursor: "pointer" }}>{expanded[p.id] ? "Read less" : "Read more"}</span>}
             <p>Price: ₹ {p.price}</p>
             <p>Stock: {p.stock}</p>
+
+            {/* Admin Delete Button */}
+            {user && user.role === "admin" && (
+              <button
+                onClick={() => handleDelete(p.id, p.name)}
+                style={{
+                  background: "#e74c3c",
+                  color: "#fff",
+                  border: "none",
+                  padding: "5px",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  marginTop: "5px"
+                }}
+              >
+                Delete
+              </button>
+            )}
+
             <button
               onClick={() => { addToCart(p); navigate("/cart"); }}
               disabled={p.stock <= 0}

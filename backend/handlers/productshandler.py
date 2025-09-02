@@ -46,15 +46,12 @@ class ProductsHandler(tornado.web.RequestHandler):
             image_url = None
             if "image" in self.request.files:
                 fileinfo = self.request.files["image"][0]
-                # get original extension (.jpg, .png etc.)
                 ext = os.path.splitext(fileinfo["filename"])[1]
-                # make a safe filename using product name
                 safe_name = name.strip().replace(" ", "_").lower()
                 timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
                 filename = f"{safe_name}_{timestamp}{ext}"
                 filepath = os.path.join(UPLOAD_DIR, filename)
-                
-                # write file
+
                 with open(filepath, "wb") as f:
                     f.write(fileinfo["body"])
                 image_url = f"uploads/{filename}"
@@ -78,4 +75,34 @@ class ProductsHandler(tornado.web.RequestHandler):
 
         except Exception as e:
             self.set_status(400)
+            self.set_header("Content-Type", "application/json")
             self.write(json.dumps({"error": str(e)}))
+
+    def delete(self):
+        try:
+            # Only admins should be able to delete products
+            # For simplicity, pass 'role' in request body (in real apps, use JWT)
+            data = json.loads(self.request.body)
+            product_id = data.get("id")
+            user_role = data.get("role")
+
+            if user_role != "admin":
+                self.set_status(403)
+                self.set_header("Content-Type", "application/json")
+                self.write({"error": "Only admins can delete products"})
+                return
+
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM products WHERE id=%s", (product_id,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            self.set_header("Content-Type", "application/json")
+            self.write({"message": "Product deleted successfully"})
+
+        except Exception as e:
+            self.set_status(400)
+            self.set_header("Content-Type", "application/json")
+            self.write({"error": str(e)})
