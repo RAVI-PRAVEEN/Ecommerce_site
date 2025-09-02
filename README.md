@@ -63,7 +63,7 @@ A full-stack e-commerce web application built with **React** for the frontend an
 
 - Stores product details: name, description, price, stock, category, image
 - Handles order placement, linked to user accounts
-- - Orders endpoint provides full visibility for admins
+- Orders endpoint provides full visibility for admins
 
 ---
 
